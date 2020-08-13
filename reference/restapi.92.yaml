@@ -4,7 +4,7 @@ info:
   version: '1.0'
   description: U4P REST API
 servers:
-  - url: 'http://localhost:8080'
+  - url: 'http://localhost:8080/univmax/restapi'
 paths:
   /92/sloprovisioning/symmetrix:
     get:
@@ -47,6 +47,79 @@ paths:
           in: query
           name: tag
           description: 'Optional value that filters returned list to display Symmetrix arrays that have a specified Tag Name e.g. equal to "tag=bronze" or contains "tag=bro"'
+        - schema:
+            type: string
+            default: Basic c21jOnNtYw==
+          in: header
+          name: Authorization
+          description: ''
+  '/92/sloprovisioning/symmetrix/{symmetrixId}':
+    get:
+      summary: GET Symmetrix Object
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SymmetrixType'
+              examples:
+                example:
+                  value:
+                    default_fba_srp: SRP_1
+                    symmetrixId: '000197900049'
+                    system_capacity:
+                      usable_total_tb: 48.9
+                      subscribed_total_tb: 51.67
+                      subscribed_allocated_tb: 8.89
+                      snapshot_total_tb: 7.8
+                      subscribed_usable_capacity_percent: 106
+                      usable_used_tb: 8.11
+                      snapshot_modified_tb: 0.01
+                    physicalCapacity:
+                      used_capacity_gb: 65391.61
+                      total_capacity_gb: 65391.61
+                    host_visible_device_count: 2142
+                    system_efficiency:
+                      overall_efficiency_ratio_to_one: 9.5
+                      virtual_provisioning_savings_ratio_to_one: 5.8
+                      data_reduction_enabled_percent: 80
+                      data_reduction_ratio_to_one: 1.4
+                      snapshot_savings_ratio_to_one: 1312.3
+                    sloCompliance:
+                      slo_marginal: 2
+                      no_slo: 108
+                      slo_stable: 143
+                      slo_critical: 0
+                    meta_data_usage:
+                      backend_meta_data_used_percent: 47
+                      replication_cache_used_percent: 0
+                      system_meta_data_used_percent: 37
+                      frontend_meta_data_used_percent: 6
+                    model: PowerMax_2000
+                    ucode: 5978.608.609
+                    device_count: 2270
+                    local: true
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+      operationId: get-92-sloprovisioning-symmetirx
+      description: This call queries for a specific authorized Symmetrix array that is compatible with service level provisioning using its ID.
+      parameters:
+        - schema:
+            type: string
+            default: Basic c21jOnNtYw==
+          in: header
+          name: Authorization
+    parameters:
+      - schema:
+          type: string
+        name: symmetrixId
+        in: path
+        required: true
+        description: The Symmetrix array ID
 components:
   schemas:
     ListSymmetrixResultType:
@@ -57,4 +130,192 @@ components:
       description: The Symmetrix Array IDs
     SymmetrixIdType:
       type: string
+    SymmetrixType:
+      title: SymmetrixType
+      type: object
+      properties:
+        symmetrixId:
+          $ref: '#/components/schemas/SymmetrixIdType'
+        device_count:
+          type: integer
+          description: The total number of volumes on the Symmetrix
+        ucode:
+          type: string
+          description: The Current Symmetrix Ucode version
+        targetUcode:
+          type: string
+          description: The Target Ucode version for this Symmetrix
+        model:
+          type: string
+          description: The Symmetrix Model
+        local:
+          type: boolean
+          description: Indicates if the Symmetrix is attached locally or remotely
+        default_fba_srp:
+          type: string
+          description: The default FBA SRP of the box
+        default_ckd_srp:
+          type: string
+          description: The default CKD SRP of the box
+        system_capacity:
+          $ref: '#/components/schemas/SystemCapacityType'
+        system_efficiency:
+          $ref: '#/components/schemas/SystemEfficiencyType'
+        meta_data_usage:
+          $ref: '#/components/schemas/MetaDataUsageType'
+        sloCompliance:
+          $ref: '#/components/schemas/SloComplianceType'
+        physicalCapacity:
+          $ref: '#/components/schemas/PhysicalCapacityType'
+        host_visibility_device_count:
+          type: integer
+          description: 'The total number of volumes that are visible to a host, non system volumes'
+        external_capacity_gb:
+          type: number
+          description: Aggregated external capacity of the SRPs
+      required:
+        - symmetrixId
+      x-examples:
+        example:
+          default_fba_srp: SRP_1
+          symmetrixId: '000197900049'
+          system_capacity:
+            usable_total_tb: 48.9
+            subscribed_total_tb: 51.67
+            subscribed_allocated_tb: 8.89
+            snapshot_total_tb: 7.8
+            subscribed_usable_capacity_percent: 106
+            usable_used_tb: 8.11
+            snapshot_modified_tb: 0.01
+          physicalCapacity:
+            used_capacity_gb: 65391.61
+            total_capacity_gb: 65391.61
+          host_visible_device_count: 2142
+          system_efficiency:
+            overall_efficiency_ratio_to_one: 9.5
+            virtual_provisioning_savings_ratio_to_one: 5.8
+            data_reduction_enabled_percent: 80
+            data_reduction_ratio_to_one: 1.4
+            snapshot_savings_ratio_to_one: 1312.3
+          sloCompliance:
+            slo_marginal: 2
+            no_slo: 108
+            slo_stable: 143
+            slo_critical: 0
+          meta_data_usage:
+            backend_meta_data_used_percent: 47
+            replication_cache_used_percent: 0
+            system_meta_data_used_percent: 37
+            frontend_meta_data_used_percent: 6
+          model: PowerMax_2000
+          ucode: 5978.608.609
+          device_count: 2270
+          local: true
+      description: ''
+    SystemCapacityType:
+      title: SystemCapacityType
+      type: object
+      description: Symmetrix Array Capacity
+      properties:
+        subscribed_allocated_tb:
+          type: number
+          description: Host allocated plus eNas allocated capacity in TBs
+        subscribed_total_tb:
+          type: number
+          description: Host subscribed capacity plus eNas subscribed capacity in TBs
+        snapshot_modified_tb:
+          type: number
+          description: Host snapshot modified capacity plus eNas snapshot modified capacity in TBs
+        snapshot_total_tb:
+          type: number
+          description: Host snapshot capacity plus eNas snapshot capacity in TBs
+        usuable_used_tb:
+          type: number
+          description: 'Total Capacity in TBs used by Host, eNas and System after Data reduction is applied'
+        usuable_total_tb:
+          type: number
+          description: Total system usable capacity in TBs
+        subscribed_usable_capacity_percent:
+          type: number
+          description: |-
+            Percentage of Usable Capacity that is currently Subscribed. Can be over 100% due to
+                                            Virtual Provisioning.
+    SystemEfficiencyType:
+      title: SystemEfficiencyType
+      type: object
+      properties:
+        overall_efficiency_ratio_to_one:
+          type: number
+          description: |-
+            Overall Efficiency Ratio is the ratio between the sum of subscribed and snapshot
+                                            capacity for user devices and the user used capacity.
+                                            Format: "1.0:1" will be returned as 1.0.
+        data_reduction_ratio_to_one:
+          type: number
+          description: |-
+            Data Reduction Ratio is the ratio between the sum of owned and RDP logical (128K track
+                                            size) capacity for all compression enabled devices and the user used capacity for all
+                                            compression enabled devices.
+                                            Format: "1.0:1" will be returned as 1.0.
+        data_reduction_enabled_percent:
+          type: number
+          description: |-
+            Data Reduction Enabled Percent represents the combined effect of compression and
+                                            deduplication.
+        virtual_provisioning_savings_ratio_to_one:
+          type: number
+          description: |-
+            Virtual Provisioning Savings Ratio is the ratio between the subscribed capacity for user
+                                            devices and the difference between allocated and shared capacity for user devices.
+                                            Format: "1.0:1" will be returned as 1.0.
+        snapshot_savings_ratio_to_one:
+          type: number
+          description: |-
+            Snapshot Savings Ratio is the ratio between snapshot capacity and the difference between
+                                            modified snapshot capacity and non shared snapshot capacity.
+                                            Format: "1.0:1" will be returned as 1.0.
+      description: Symmetrix System Efficiency
+    MetaDataUsageType:
+      title: MetaDataUsageType
+      type: object
+      properties:
+        system_meta_data_used_percent:
+          type: number
+          description: System Meta Data Used Percent based on the number of subscribed volumes on the VMAX
+        replication_cache_used_percent:
+          type: integer
+          description: Cache percentage used for Replication
+        frontend_meta_data_used_percent:
+          type: number
+          description: Frontend Meta Data Percent (only available on uCode 5978 or higher)
+        backend_meta_data_used_percent:
+          type: number
+          description: Backend Meta Data Percent (only available on uCode 5978 or higher)
+      description: Symmetrix Meta Data Usage
+    SloComplianceType:
+      title: SloComplianceType
+      type: object
+      description: The total number of Storage Groups on a Symmetrix based on their Complinace
+      properties:
+        slo_stable:
+          type: integer
+          description: Stable state
+        slo_marginal:
+          type: integer
+          description: Marginal state
+        slo_critical:
+          type: integer
+          description: Critical state
+        no_slo:
+          type: integer
+          description: No service level
+    PhysicalCapacityType:
+      title: PhysicalCapacityType
+      type: object
+      properties:
+        used_capacity_gb:
+          type: number
+        total_capacity_gb:
+          type: number
+      description: The total amount of used Raw capacity of all the disks
   securitySchemes: {}
