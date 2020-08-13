@@ -1,0 +1,60 @@
+openapi: 3.0.0
+info:
+  title: REST API
+  version: '1.0'
+  description: U4P REST API
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /92/sloprovisioning/symmetrix:
+    get:
+      summary: GET Symmetrix
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSymmetrixResultType'
+              examples:
+                example:
+                  value:
+                    symmetrixId:
+                      - '000196700153'
+                      - '000197900049'
+                      - '000197900256'
+                      - '000297900330'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+      operationId: get-92-sloprovisioning-symmetrix
+      description: This call queries for a list of authorized Symmetrix array IDs compatible with service level provisioning.
+      parameters:
+        - schema:
+            type: boolean
+          in: query
+          name: ckd_capable
+          description: Optional value that filters the returned list to display those Symmetrix arrays that support the creation of CKD volumes (true/false)
+        - schema:
+            type: boolean
+          in: query
+          name: compressionCapable
+          description: Optional value that filters the returned list to display Symmetrix arrays that support compression (true/false)
+        - schema:
+            type: string
+          in: query
+          name: tag
+          description: 'Optional value that filters returned list to display Symmetrix arrays that have a specified Tag Name e.g. equal to "tag=bronze" or contains "tag=bro"'
+components:
+  schemas:
+    ListSymmetrixResultType:
+      title: ListSymmetrixResultType
+      type: array
+      items:
+        $ref: '#/components/schemas/SymmetrixIdType'
+      description: The Symmetrix Array IDs
+    SymmetrixIdType:
+      type: string
+  securitySchemes: {}
