@@ -442,14 +442,16 @@ components:
     AddTagsParamType:
       title: AddTagsParamType
       type: object
+      description: Adds new tags to the Storage Group
       properties:
         tag_name:
           $ref: '#/components/schemas/TagId'
-      description: Adds new tags to the Storage Group
     TagId:
       title: TagId
-      type: string
+      type: array
       description: '  Tag Names to be added.'
+      items:
+        type: string
     RemoveTagsParamType:
       title: RemoveTagsParamType
       type: object
