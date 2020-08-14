@@ -120,6 +120,103 @@ paths:
         in: path
         required: true
         description: The Symmetrix array ID
+    put:
+      summary: Modify Array
+      operationId: put-92-sloprovisioning-symmetrix-symmetrixId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SymmetrixType'
+              examples:
+                example-1:
+                  value:
+                    default_fba_srp: SRP_1
+                    symmetrixId: '000197900049'
+                    system_capacity:
+                      usable_total_tb: 48.9
+                      subscribed_total_tb: 51.67
+                      subscribed_allocated_tb: 8.89
+                      snapshot_total_tb: 7.8
+                      subscribed_usable_capacity_percent: 106
+                      usable_used_tb: 8.11
+                      snapshot_modified_tb: 0.01
+                    physicalCapacity:
+                      used_capacity_gb: 65391.61
+                      total_capacity_gb: 65391.61
+                    host_visible_device_count: 2142
+                    system_efficiency:
+                      overall_efficiency_ratio_to_one: 9.5
+                      virtual_provisioning_savings_ratio_to_one: 5.8
+                      data_reduction_enabled_percent: 80
+                      data_reduction_ratio_to_one: 1.4
+                      snapshot_savings_ratio_to_one: 1312.3
+                    sloCompliance:
+                      slo_marginal: 2
+                      no_slo: 108
+                      slo_stable: 143
+                      slo_critical: 0
+                    meta_data_usage:
+                      backend_meta_data_used_percent: 47
+                      replication_cache_used_percent: 0
+                      system_meta_data_used_percent: 37
+                      frontend_meta_data_used_percent: 6
+                    model: PowerMax_2000
+                    ucode: 5978.608.609
+                    device_count: 2270
+                    local: true
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobType'
+              examples:
+                example-1:
+                  value:
+                    jobId: '1597400970269'
+                    name: 000197900049 Tag Store Update
+                    status: SCHEDULED
+                    username: "C:irco2sd25vm07\\smc"
+                    last_modified_date: 'Aug-14-2020 11:29:30.271'
+                    last_modified_date_milliseconds: 1597400970271
+                    completed_date_milliseconds: 0
+                    task:
+                      - execution_order: 1
+                        description: 'Add tag(s) [my_array] - Symmetrix [000197900049]'
+                    resourceLink: 'https://10.60.141.135:8443/univmax/restapi/92/sloprovisioning/symmetrix/000197900049'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+        '500':
+          description: Internal Server Error
+      description: This call modifies an existing Symmetrix array. Choose one edit operation only per request.
+      parameters:
+        - schema:
+            type: string
+            default: Basic c21jOnNtYw==
+          in: header
+          name: Authorization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditSymmetrixParamType'
+            examples:
+              example:
+                value:
+                  editSymmetrixActionParam:
+                    tagManagementParam:
+                      addTagsParam:
+                        tag_name:
+                          - my_array
 components:
   schemas:
     ListSymmetrixResultType:
@@ -318,4 +415,163 @@ components:
         total_capacity_gb:
           type: number
       description: The total amount of used Raw capacity of all the disks
+    EditSymmetrixParamType:
+      title: EditSymmetrixParamType
+      type: object
+      description: Select one of the Edit Options to modify the specified Symmetrix
+      properties:
+        editSymmetrixActionParam:
+          $ref: '#/components/schemas/EditSymmetrixActionParamType'
+      x-examples:
+        example-1: {}
+    EditSymmetrixActionParamType:
+      title: EditSymmetrixActionParamType
+      type: object
+      properties:
+        tagManagementParam:
+          $ref: '#/components/schemas/TagManagementParamType'
+      description: Add/Remove Tags to/from the specified Storage Group
+    TagManagementParamType:
+      title: TagManagementParamType
+      type: object
+      properties:
+        addTagsParam:
+          $ref: '#/components/schemas/AddTagsParamType'
+        removeTagsParam:
+          $ref: '#/components/schemas/RemoveTagsParamType'
+    AddTagsParamType:
+      title: AddTagsParamType
+      type: object
+      properties:
+        tag_name:
+          $ref: '#/components/schemas/TagId'
+      description: Adds new tags to the Storage Group
+    TagId:
+      title: TagId
+      type: string
+      description: '  Tag Names to be added.'
+    RemoveTagsParamType:
+      title: RemoveTagsParamType
+      type: object
+      properties:
+        tag_name:
+          $ref: '#/components/schemas/TagId'
+      description: Removes tags from the Storage Group
+    JobType:
+      title: JobType
+      type: object
+      description: ''
+      x-examples:
+        example-1: {}
+      properties:
+        jobId:
+          type: string
+          description: Unique identifier for the job
+        name:
+          type: string
+          description: Name of the job
+        symmetrixId:
+          type: string
+          description: Job Symmetrix ID
+        status:
+          type: string
+          description: Job execution status
+        username:
+          type: string
+          description: Username that have created the job
+        last_modified_date:
+          type: string
+          description: Date at which the job was last modified
+        last_modified_date_milliseconds:
+          description: Date at which the job was last modified in miliseconds
+          type: number
+        scheduled_date:
+          type: string
+          description: Execution date for which the job has been scheduled
+        scheduled_date_milliseconds:
+          type: number
+          description: Execution date for which the job has been scheduled in miliseconds
+        completed_date:
+          type: string
+          description: Date at which the job execution has been completed
+        completed_date_milliseconds:
+          type: number
+          description: Date at which the job execution has been completed in miliseconds
+        task:
+          type: array
+          description: List of tasks associated with the job
+          items:
+            $ref: '#/components/schemas/TaskType'
+        resourceLink:
+          type: string
+          description: REST endpoint for which the job has been triggered
+        result:
+          type: string
+          description: Detailed job result status description
+        links:
+          $ref: '#/components/schemas/UriLink'
+    JobIdType:
+      title: JobId-Type
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+    JobStatus:
+      title: JobStatus
+      type: object
+      properties:
+        UNSCHEDULED:
+          type: string
+        SCHEDULED:
+          type: string
+        RUNNING:
+          type: string
+        SUCCEEDED:
+          type: string
+        FAILED:
+          type: string
+        ABORTED:
+          type: string
+        UNKNOWN:
+          type: string
+        VALIDATING:
+          type: string
+        VALIDATED:
+          type: string
+        VALIDATE_FAILED:
+          type: string
+        INVALID:
+          type: string
+        RETRIEVING_PICTURE:
+          type: string
+      x-examples:
+        example-1: {}
+    TaskType:
+      title: TaskType
+      type: object
+      description: ''
+      properties:
+        execution_order:
+          type: integer
+          description: Order in which task is to be executed
+        description:
+          type: string
+          description: Description of the task to be executed
+    UriLink:
+      title: UriLink
+      type: object
+      description: Represents a key and and set of URIs
+      properties:
+        key:
+          $ref: '#/components/schemas/UriLinkKeys'
+        uri:
+          type: string
+          description: URI link
+    UriLinkKeys:
+      type: string
+      title: UriLinkKeys
+      enum:
+        - SNAPSHOT_CREATED
+      description: URI key
   securitySchemes: {}
